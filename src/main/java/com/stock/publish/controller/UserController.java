@@ -16,7 +16,7 @@ public class UserController {
     }
 
     @PostMapping("/upgrade")
-    public ApiResponse<Void> upgrade() {
+    public Object upgrade() {
         // 获取目前用户角色
         UserContext.UserRole role = UserContext.getRole();
 
