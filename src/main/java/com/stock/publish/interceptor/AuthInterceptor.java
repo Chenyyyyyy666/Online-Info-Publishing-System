@@ -5,6 +5,7 @@ import com.stock.publish.entity.LocalUserSubscription;
 import com.stock.publish.mapper.LocalUserSubscriptionMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.catalina.User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -20,6 +21,9 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response,
                              Object handler) {
+        // 清理当前线程的上下文
+        UserContext.clear();
+
         // 从 Header 提取 "Authorization: Bearer {token}"
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
