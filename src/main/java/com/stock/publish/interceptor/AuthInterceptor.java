@@ -1,11 +1,10 @@
 package com.stock.publish.interceptor;
 
-import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.stock.publish.entity.LocalUserSubscription;
 import com.stock.publish.mapper.LocalUserSubscriptionMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.catalina.User;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -56,8 +55,8 @@ public class AuthInterceptor implements HandlerInterceptor {
         }
 
         // 5. 校验通过 → 查 local_user_subscription
-        QueryWrapper<LocalUserSubscription> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("global_user_id", globalUserId);
+        LambdaQueryWrapper<LocalUserSubscription> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(LocalUserSubscription::getGlobalUserId, globalUserId);
         LocalUserSubscription subscription = subscriptionMapper.selectOne(queryWrapper);
 
         // 无记录则自动插入
