@@ -48,10 +48,13 @@ const handleLogout = () => {
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
 .app-shell {
   min-height: 100vh;
-  background: linear-gradient(180deg, #07111f 0%, #0f172a 100%);
-  color: #eef2ff;
+  background: #F8F9FA;
+  color: #1b1c1c;
+  font-family: 'Inter', sans-serif;
 }
 
 .topbar {
@@ -60,20 +63,19 @@ const handleLogout = () => {
   justify-content: space-between;
   gap: 16px;
   padding: 14px 20px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.18);
-  background: rgba(15, 23, 42, 0.92);
+  border-bottom: 1px solid #E8E8E8;
+  background: #ffffff;
   position: sticky;
   top: 0;
   z-index: 10;
 }
 
 .brand {
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: #fff;
+  color: #b7000c;
+  font-family: 'IBM Plex Sans', sans-serif;
   text-decoration: none;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 .subsystem-links {
@@ -82,9 +84,15 @@ const handleLogout = () => {
 }
 
 .subsystem-links a {
-  color: #dbeafe;
+  color: #666666;
   text-decoration: none;
   font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.subsystem-links a:hover {
+  color: #b7000c;
 }
 
 .actions {
@@ -96,7 +104,7 @@ const handleLogout = () => {
 .role-pill,
 .primary-btn,
 .ghost-btn {
-  border-radius: 999px;
+  border-radius: 4px;
   padding: 8px 12px;
   border: 1px solid transparent;
   font-size: 0.92rem;
@@ -104,21 +112,26 @@ const handleLogout = () => {
 }
 
 .role-pill {
-  background: rgba(129, 140, 248, 0.18);
-  border-color: rgba(129, 140, 248, 0.35);
-  color: #e0e7ff;
+  background: #ffdad5;
+  border-color: #ffb4aa;
+  color: #410001;
+  font-weight: 600;
 }
 
 .primary-btn {
-  background: linear-gradient(135deg, #818cf8, #38bdf8);
-  color: #08111f;
+  background: #b7000c;
+  color: #ffffff;
   font-weight: 700;
 }
 
 .ghost-btn {
-  background: rgba(15, 23, 42, 0.7);
-  color: #e2e8f0;
-  border-color: rgba(148, 163, 184, 0.4);
+  background: #fbf9f8;
+  color: #1b1c1c;
+  border-color: #E8E8E8;
+}
+
+.ghost-btn:hover {
+  background: #f6f3f2;
 }
 
 .page-shell {
