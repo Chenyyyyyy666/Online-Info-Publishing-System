@@ -213,6 +213,11 @@ public class MarketServiceImpl implements MarketService {
             QuoteDTO quote = buildQuote(code);
             quote.setLastPrice(lastPrice);
             quote.setChangeRate(changeRate);
+            // Mock 盘口：买一 = lastPrice − 0.01，卖一 = lastPrice + 0.01
+            quote.setBidPrice(lastPrice.subtract(new BigDecimal("0.01")));
+            quote.setAskPrice(lastPrice.add(new BigDecimal("0.01")));
+            quote.setBidVolume(10000L + (long) (Math.random() * 50000));
+            quote.setAskVolume(8000L + (long) (Math.random() * 40000));
             try {
                 String json = objectMapper.writeValueAsString(quote);
                 redisTemplate.opsForValue().set("quote:" + code, json, 5, TimeUnit.SECONDS);
@@ -248,15 +253,17 @@ public class MarketServiceImpl implements MarketService {
                 BigDecimal price = base.multiply(BigDecimal.valueOf(1.0 + pct))
                         .setScale(2, RoundingMode.HALF_UP);
                 long qty = 1000L + (long) (Math.random() * 50000);
+                // 固定账户名，确保 TopTraderEngine 能累积
+                String buyer = "B_" + code;
+                String seller = "S_" + code;
                 list.add(new TransactionRecord(code, now.minusSeconds(count - i),
-                        "买方" + (char) ('A' + i), "卖方" + (char) ('X' + i), price, qty));
+                        buyer, seller, price, qty));
             }
         }
         return list;
     }
 
-    // TODO 测试后改回 300000
-    @Scheduled(initialDelay = 60000, fixedRate = 300000)
+    @Scheduled(initialDelay = 300000, fixedRate = 300000)
     public void aggregate5mKline() {
         // DONE: 1. 从 Redis "tick:{stockCode}" 取出过去5分钟的所有 tick
         // DONE: 2. 聚合为 OHLCV
