@@ -123,6 +123,13 @@ const formatRate = (value) => {
   return `${numeric >= 0 ? '+' : ''}${numeric.toFixed(2)}%`
 }
 
+const parseChangeRate = (val) => {
+  if (val == null) return 0
+  // API 返回 "+1.20%" 格式，去掉 % 再转数字
+  const s = String(val).replace('%', '')
+  return Number(s) || 0
+}
+
 const normalizeQuote = (item, fallbackCode) => {
   const code = item.stock_code || item.stockCode || fallbackCode
 
@@ -130,7 +137,7 @@ const normalizeQuote = (item, fallbackCode) => {
     stock_code: String(code),
     stock_name: item.stock_name || item.stockName || '—',
     last_price: Number(item.last_price ?? item.lastPrice ?? 0),
-    change_rate: Number(item.change_rate ?? item.changeRate ?? 0)
+    change_rate: parseChangeRate(item.change_rate ?? item.changeRate)
   }
 }
 
