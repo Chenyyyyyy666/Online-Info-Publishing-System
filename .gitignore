@@ -39,3 +39,5 @@ apache-maven-*/
 *.tmp
 *.bak
 jdk-17.0.12+7/
+mysql-*/
+redis-*
