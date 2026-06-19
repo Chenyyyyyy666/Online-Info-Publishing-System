@@ -119,102 +119,59 @@ function renderChart() {
   const ma10 = calcMA(data, 10)
   const { difList, deaList, macdBar } = calcMACD(data)
 
+  // 检测是否包含 MACD 数据（STANDARD 会被后端清为 null）
+  const hasMACD = difList.some(v => v != null)
+
+  const legendData = hasMACD
+    ? ['K线', 'MA5', 'MA10', 'DIF', 'DEA', 'MACD']
+    : ['K线', 'MA5', 'MA10']
+  const grid = hasMACD
+    ? [
+        { left: '3%', right: '4%', top: '12%', height: '60%' },
+        { left: '3%', right: '4%', top: '75%', height: '18%' }
+      ]
+    : [
+        { left: '3%', right: '4%', top: '12%', height: '80%' }
+      ]
+  const xAxisData = hasMACD
+    ? [
+        { type: 'category', data: xData, boundaryGap: false, axisLine: { onZero: false }, splitLine: { show: false }, axisLabel: { show: false } },
+        { gridIndex: 1, type: 'category', data: xData, boundaryGap: false, axisLine: { onZero: false }, splitLine: { show: false } }
+      ]
+    : [
+        { type: 'category', data: xData, boundaryGap: false, axisLine: { onZero: false }, splitLine: { show: false } }
+      ]
+  const yAxisData = hasMACD
+    ? [ { scale: true, splitLine: { lineStyle: { type: 'dashed' } } },
+        { gridIndex: 1, scale: true } ]
+    : [ { scale: true, splitLine: { lineStyle: { type: 'dashed' } } } ]
+
+  const macdSeries = hasMACD ? [
+    { name: 'DIF', type: 'line', xAxisIndex: 1, yAxisIndex: 1, data: difList, lineStyle: { color: '#0ea5e9', width: 1.2 }, symbol: 'none' },
+    { name: 'DEA', type: 'line', xAxisIndex: 1, yAxisIndex: 1, data: deaList, lineStyle: { color: '#f97316', width: 1.2 }, symbol: 'none' },
+    { name: 'MACD', type: 'bar', xAxisIndex: 1, yAxisIndex: 1, data: macdBar, itemStyle: { color: '#ef4444', color0: '#22c55e' } }
+  ] : []
+
   const option = {
-    tooltip: {
-      trigger: 'axis',
-      axisPointer: { type: 'cross' }
-    },
-    legend: {
-      data: ['K线', 'MA5', 'MA10', 'DIF', 'DEA', 'MACD'],
-      top: 0
-    },
-    grid: [
-      { left: '3%', right: '4%', top: '12%', height: '60%' },
-      { left: '3%', right: '4%', top: '75%', height: '18%' }
-    ],
-    xAxis: [
-      {
-        type: 'category',
-        data: xData,
-        boundaryGap: false,
-        axisLine: { onZero: false },
-        splitLine: { show: false },
-        axisLabel: { show: false }
-      },
-      {
-        gridIndex: 1,
-        type: 'category',
-        data: xData,
-        boundaryGap: false,
-        axisLine: { onZero: false },
-        splitLine: { show: false }
-      }
-    ],
-    yAxis: [
-      { scale: true, splitLine: { lineStyle: { type: 'dashed' } } },
-      { gridIndex: 1, scale: true }
-    ],
+    tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+    legend: { data: legendData, top: 0 },
+    grid: grid,
+    xAxis: xAxisData,
+    yAxis: yAxisData,
     series: [
       {
-        name: 'K线',
-        type: 'candlestick',
-        xAxisIndex: 0,
-        yAxisIndex: 0,
-        data: kData,
-        itemStyle: {
-          color: '#ef4444',
-          color0: '#22c55e',
-          borderColor: '#ef4444',
-          borderColor0: '#22c55e'
-        }
+        name: 'K线', type: 'candlestick', xAxisIndex: 0, yAxisIndex: 0, data: kData,
+        itemStyle: { color: '#ef4444', color0: '#22c55e', borderColor: '#ef4444', borderColor0: '#22c55e' }
       },
       {
-        name: 'MA5',
-        type: 'line',
-        xAxisIndex: 0,
-        yAxisIndex: 0,
-        data: ma5,
-        lineStyle: { color: '#ffffff', width: 1.5 },
-        symbol: 'none'
+        name: 'MA5', type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: ma5,
+        lineStyle: { color: '#ffffff', width: 1.5 }, symbol: 'none'
       },
       {
-        name: 'MA10',
-        type: 'line',
-        xAxisIndex: 0,
-        yAxisIndex: 0,
-        data: ma10,
-        lineStyle: { color: '#eab308', width: 1.5 },
-        symbol: 'none'
+        name: 'MA10', type: 'line', xAxisIndex: 0, yAxisIndex: 0, data: ma10,
+        lineStyle: { color: '#eab308', width: 1.5 }, symbol: 'none'
       },
-      {
-        name: 'DIF',
-        type: 'line',
-        xAxisIndex: 1,
-        yAxisIndex: 1,
-        data: difList,
-        lineStyle: { color: '#0ea5e9', width: 1.2 },
-        symbol: 'none'
-      },
-      {
-        name: 'DEA',
-        type: 'line',
-        xAxisIndex: 1,
-        yAxisIndex: 1,
-        data: deaList,
-        lineStyle: { color: '#f97316', width: 1.2 },
-        symbol: 'none'
-      },
-      {
-        name: 'MACD',
-        type: 'bar',
-        xAxisIndex: 1,
-        yAxisIndex: 1,
-        data: macdBar,
-        itemStyle: {
-          color: '#ef4444',
-          color0: '#22c55e'
-        }
-      }
+      ...macdSeries
     ]
   }
   chartInstance.setOption(option)
