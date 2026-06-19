@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/market")
@@ -45,8 +46,10 @@ public class MarketController {
         if (role == UserContext.UserRole.GUEST) {
             return ApiResponse.fail(403, "游客无权查看K线图");
         }
-        if (role == UserContext.UserRole.STANDARD && !"1D".equals(period)) {
-            return ApiResponse.fail(403, "普通用户仅可查看日K线(1D)");
+        // STANDARD 可看常用尺度，VIP 解锁 1W/1M/1Y
+        Set<String> standardPeriods = Set.of("5M", "15M", "30M", "1H", "1D");
+        if (role == UserContext.UserRole.STANDARD && !standardPeriods.contains(period)) {
+            return ApiResponse.fail(403, "升级VIP解锁周/月/年K线");
         }
 
         LocalDateTime end = LocalDateTime.now();

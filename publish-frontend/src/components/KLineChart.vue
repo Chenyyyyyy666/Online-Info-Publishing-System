@@ -40,18 +40,23 @@ const emit = defineEmits(['change-period', 'need-upgrade'])
 const userStore = useUserStore()
 
 const periodList = [
-  { key: '5M', label: '5M' },
-  { key: '1H', label: '1H' },
-  { key: '1D', label: '1D' },
-  { key: '1M', label: '1M' },
-  { key: '1Y', label: '1Y' }
+  { key: '5M',  label: '5分' },
+  { key: '15M', label: '15分' },
+  { key: '30M', label: '30分' },
+  { key: '1H',  label: '1时' },
+  { key: '1D',  label: '日' },
+  { key: '1W',  label: '周' },
+  { key: '1M',  label: '月' },
+  { key: '1Y',  label: '年' },
 ]
+
+const standardPeriods = ['5M', '15M', '30M', '1H', '1D']
 
 const chartRef = ref(null)
 let chartInstance = null
 
 const handlePeriodClick = (targetKey) => {
-  if (targetKey === '1D') {
+  if (standardPeriods.includes(targetKey)) {
     emit('change-period', targetKey)
     return
   }

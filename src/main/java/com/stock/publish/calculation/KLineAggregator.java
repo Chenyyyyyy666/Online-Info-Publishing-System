@@ -69,11 +69,14 @@ public class KLineAggregator {
         // 3. 确定聚合步长 (Chunk Size)
         int chunkSize = 1;
         switch (period.toUpperCase()) {
-            case "5M": chunkSize = 1; break;
-            case "1H": chunkSize = 12; break; // 60分钟 / 5分钟 = 12条
-            case "1D": chunkSize = 48; break; // 每天 4 小时交易时间：240分钟 / 5分钟 = 48条
-            case "1M": chunkSize = 48 * 22; break; // 简易按每月 22 个交易日估算聚合
-            case "1Y": chunkSize = 48 * 250; break; // 简易按每年 250 个交易日估算聚合
+            case "5M":  chunkSize = 1; break;
+            case "15M": chunkSize = 3; break;   // 15分钟 / 5分钟 = 3条
+            case "30M": chunkSize = 6; break;   // 30分钟 / 5分钟 = 6条
+            case "1H":  chunkSize = 12; break;  // 60分钟 / 5分钟 = 12条
+            case "1D":  chunkSize = 48; break;  // 4小时交易 / 5分钟 = 48条
+            case "1W":  chunkSize = 48 * 5; break;  // 5个交易日
+            case "1M":  chunkSize = 48 * 22; break; // 约22个交易日
+            case "1Y":  chunkSize = 48 * 250; break; // 约250个交易日
             default: throw new IllegalArgumentException("Unsupported period: " + period);
         }
 
