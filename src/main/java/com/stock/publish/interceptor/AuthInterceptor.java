@@ -26,56 +26,54 @@ public class AuthInterceptor implements HandlerInterceptor {
         // 从 Header 提取 "Authorization: Bearer {token}"
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            // 没有对应Token，设置角色为GUEST
             UserContext.setRole(UserContext.UserRole.GUEST);
             return true;
         }
 
         String token = authHeader.substring(7);
 
-        // 外部鉴权接口调用（ Mock 模拟）
-        // 后续阶段，此处需整体替换为 RestTemplate 发起真实的 HTTP POST 请求
-        // 目标接口契约：http://account-system/api/v1/auth/certificate-validate
-        boolean isSuccess = true;
-        boolean certificateBind = true;
-        String globalUserId = "U1001"; // Mock 的默认返回ID
+        // 外部鉴权接口调用（Mock 模拟账户系统 clientLoginAuth）
+        // 后续替换为：HTTP POST http://account-system/api/v1/auth/clientLoginAuth
+        // 请求体：{ fund_acc_no, trade_password }
+        // 返回：{ code, fund_acc_no, sec_acc_no, status }
+        // sec_acc_no 不为空 → 证书已绑定；status == 0 → 账户正常
+        boolean authSuccess = true;
+        String fundAccNo = "F0001";   // 对应 local_user_subscription.global_user_id
+        String secAccNo = "S0001";    // 不为空 = 安全证书已绑定
 
-        // 简单的 Mock 逻辑，用于模拟异常 Token
         if ("invalid_token".equals(token)) {
-            isSuccess = false;
+            authSuccess = false;
         }
         if ("no_cert_token".equals(token)) {
-            certificateBind = false;
+            secAccNo = null; // 模拟证书未绑定
         }
 
-        // 4. certificate_bind==false 或请求失败 → 降级 GUEST (不返回 401 拦截)
-        if (!isSuccess || !certificateBind) {
+        // 登录失败 或 证书未绑定 → 降级 GUEST
+        if (!authSuccess || secAccNo == null || secAccNo.isEmpty()) {
             UserContext.setRole(UserContext.UserRole.GUEST);
             return true;
         }
 
-        // 5. 校验通过 → 查 local_user_subscription
+        // 校验通过 → 查 local_user_subscription
         LambdaQueryWrapper<LocalUserSubscription> queryWrapper = new LambdaQueryWrapper<>();
-        queryWrapper.eq(LocalUserSubscription::getGlobalUserId, globalUserId);
+        queryWrapper.eq(LocalUserSubscription::getGlobalUserId, fundAccNo);
         LocalUserSubscription subscription = subscriptionMapper.selectOne(queryWrapper);
 
-        // 无记录则自动插入
+        // 首次访问自动注册
         if (subscription == null) {
             subscription = new LocalUserSubscription();
-            subscription.setGlobalUserId(globalUserId);
+            subscription.setGlobalUserId(fundAccNo);
             subscription.setIsPremium(false);
             subscriptionMapper.insert(subscription);
         }
 
-        // 根据 is_premium 设置用户类别为 STANDARD 或 PREMIUM_VIP
         if (Boolean.TRUE.equals(subscription.getIsPremium())) {
             UserContext.setRole(UserContext.UserRole.PREMIUM_VIP);
         } else {
             UserContext.setRole(UserContext.UserRole.STANDARD);
         }
 
-        // 将 global_user_id 和 role 存入 UserContext
-        UserContext.setGlobalUserId(globalUserId);
+        UserContext.setGlobalUserId(fundAccNo);
 
         return true;
     }

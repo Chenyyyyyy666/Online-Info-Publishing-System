@@ -125,7 +125,7 @@ class AuthInterceptorTest {
         // Assert: 验证新用户的自动化注册与评级
         assertTrue(result);
         assertEquals(UserContext.UserRole.STANDARD, UserContext.getRole(), "新注册用户在本地默认拥有 STANDARD 普通用户权限");
-        assertEquals("U1001", UserContext.getGlobalUserId(), "成功提取外部接口契约约定的 Mock 用户 ID : U1001");
+        assertEquals("F0001", UserContext.getGlobalUserId(), "成功提取外部接口契约约定的 Mock 用户 ID : U1001");
 
         // 行为验证：必须确保拦截器内部调用了 mapper.insert 方法，为新用户在 MySQL 建立了基础行记录
         verify(subscriptionMapper, times(1)).insert(any(LocalUserSubscription.class));
@@ -142,7 +142,7 @@ class AuthInterceptorTest {
 
         // 构造本地数据库已有的订阅行对象
         LocalUserSubscription subscription = new LocalUserSubscription();
-        subscription.setGlobalUserId("U1001");
+        subscription.setGlobalUserId("F0001");
         subscription.setIsPremium(true); // 标记此人已购买 VIP 服务
 
         // 桩实现：模拟查库返回该 VIP 用户记录
@@ -154,7 +154,7 @@ class AuthInterceptorTest {
         // Assert: 验证高级权限提取
         assertTrue(result);
         assertEquals(UserContext.UserRole.PREMIUM_VIP, UserContext.getRole(), "本地库 is_premium 为 true，应判定为 PREMIUM_VIP");
-        assertEquals("U1001", UserContext.getGlobalUserId());
+        assertEquals("F0001", UserContext.getGlobalUserId());
 
         // 行为验证：既然老用户记录已存在，拦截器绝对不能再次执行 insert 插入操作，否则会造成主键/唯一索引冲突
         verify(subscriptionMapper, never()).insert(any(LocalUserSubscription.class));
@@ -167,7 +167,7 @@ class AuthInterceptorTest {
     @Test
     void testAfterCompletion() {
         // Arrange: 先为主线程上下文模拟填入用户信息
-        UserContext.setGlobalUserId("U1001");
+        UserContext.setGlobalUserId("F0001");
         UserContext.setRole(UserContext.UserRole.STANDARD);
 
         // Act: 调用生命周期销毁钩子
