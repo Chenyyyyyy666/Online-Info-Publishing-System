@@ -18,7 +18,7 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted, nextTick } from 'vue'
 import * as echarts from 'echarts'
-import { useUserStore } from '@/stores/user'
+import { useUserStore } from '../stores/user'
 
 const props = defineProps({
   klineData: {

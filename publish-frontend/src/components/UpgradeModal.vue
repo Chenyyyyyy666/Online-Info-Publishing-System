@@ -54,8 +54,8 @@
 
 <script setup>
 import { ref } from 'vue'
-import { useUserStore } from '@/stores/user'
-import { upgradeToVip } from '@/api/market'
+import { useUserStore } from '../stores/user'
+import { upgradeToVip } from '../api/market'
 
 // 接收父组件传入的显隐控制
 const props = defineProps({
