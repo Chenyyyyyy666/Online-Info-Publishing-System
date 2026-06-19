@@ -26,6 +26,7 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from './stores/user'
+import { getMyInfo } from './api/market'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -36,9 +37,23 @@ const roleLabel = computed(() => {
   return 'GUEST'
 })
 
-const handleLogin = () => {
-  const target = encodeURIComponent(window.location.href)
-  window.location.href = `https://account.example.com/login?redirect=${target}`
+const handleLogin = async () => {
+  // 本地模拟登录：设置 mock token，然后查询后端获取真实角色
+  userStore.setToken('mock_token_U1001')
+  try {
+    const info = await getMyInfo()
+    if (info) {
+      userStore.setRole(info.role || 'STANDARD')
+      userStore.setGlobalUserId(info.globalUserId || 'U1001')
+    } else {
+      userStore.setRole('STANDARD')
+      userStore.setGlobalUserId('U1001')
+    }
+  } catch {
+    userStore.setRole('STANDARD')
+    userStore.setGlobalUserId('U1001')
+  }
+  location.reload()
 }
 
 const handleLogout = () => {
