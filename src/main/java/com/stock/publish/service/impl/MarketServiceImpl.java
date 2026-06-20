@@ -174,7 +174,7 @@ public class MarketServiceImpl implements MarketService {
             long quantity
     ) {}
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(cron = "*/5 * * * * *")
     @Override
     public void refreshQuotes() {
         // DONE: 1. 从中央交易系统拉取最新成交流水（Mock）
@@ -263,7 +263,7 @@ public class MarketServiceImpl implements MarketService {
         return list;
     }
 
-    @Scheduled(initialDelay = 300000, fixedRate = 300000)
+    @Scheduled(cron = "0 */5 * * * *")
     public void aggregate5mKline() {
         // DONE: 1. 从 Redis "tick:{stockCode}" 取出过去5分钟的所有 tick
         // DONE: 2. 聚合为 OHLCV
@@ -306,7 +306,11 @@ public class MarketServiceImpl implements MarketService {
             kline.setHighPrice(high);
             kline.setLowPrice(low);
             kline.setVolume(volume);
-            kline5mDataMapper.insert(kline);
+            try {
+                kline5mDataMapper.insert(kline);
+            } catch (org.springframework.dao.DuplicateKeyException e) {
+                // 该时段已有记录（例如重启后重复聚合），忽略
+            }
 
             // 清空已消费的 tick
             redisTemplate.delete(tickKey);
